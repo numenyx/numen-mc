@@ -12,7 +12,8 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          apt full-upgrade -y
+          apt upgrade -y
+          sudo apt autoremove -y
           sudo apt install wireguard
           sudo apt install -y wget unzip openssh-server
           sudo ip link add dev wg0 type wireguard
