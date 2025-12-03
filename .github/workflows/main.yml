@@ -1,8 +1,7 @@
 name: MC Setup
 
 on:
-  - push
-  - workflow_dispatch
+  workflow_dispatch:
 
 jobs:
   build:
