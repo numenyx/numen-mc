@@ -1,6 +1,7 @@
 name: MC Setup
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
