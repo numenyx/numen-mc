@@ -1,8 +1,8 @@
 name: MC Setup
 
 on:
-  - push
-  - workflow_dispatch
+  push:
+  workflow_dispatch:
 
 jobs:
   build:
@@ -12,26 +12,16 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo apt install -y wget unzip
-
-      - name: Download WireGuard-Go (userspace WG)
-        run: |
-          wget https://github.com/WireGuard/wireguard-go/releases/latest/download/wireguard-go-linux-amd64 -O wireguard-go
-          chmod +x wireguard-go
-
-      - name: Download WireGuard Tools (wg + wg-quick)
-        run: |
-          wget https://github.com/WireGuard/wgctrl-go/releases/latest/download/wg -O wg
-          chmod +x wg
+          sudo apt install wireguard
+          sudo apt install -y wget unzip openssh-server
           
-      - name: Run WireGuard-Go Userspace
+      - name: Set SSH Password
+        run: echo "runneradmin:kaminumen!" | sudo chpasswd
+
+      - name: Enable SSH
         run: |
-          sudo ip link add dev wg0 type wireguard || true
-          sudo ip addr add 10.0.0.2/24 dev wg0 || true
-          sudo ip link set wg0 up || true
-          ./wireguard-go wg0 &
-          sleep 2
-          ./wg setconf wg0 wg/wg0.conf
+          sudo systemctl enable ssh
+          sudo systemctl start ssh
 
       - name: Download Ngrok
         run: wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip -O ngrok.zip
