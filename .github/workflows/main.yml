@@ -12,16 +12,20 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          sudo usermod -aG sudo runneradmin
           sudo apt install wireguard
           sudo apt install -y wget unzip openssh-server
           sudo ip link add dev wg0 type wireguard
-          
-      - name: Create runneradmin user
-        run: sudo useradd -m -s /bin/bash runneradmin
+          mkdir -p ~/wireguard
+          cd ~/wireguard
+          pwd
 
+      - name: Create user
+        run: |
+          sudo useradd -m -s /bin/bash kaminumen
+          sudo usermod -aG sudo kaminumen
+          
       - name: Set SSH Password
-        run: echo "runneradmin:kaminumen1" | sudo chpasswd
+        run: echo "kaminumen:kaminumen0" | sudo chpasswd
         
       - name: Enable SSH
         run: |
