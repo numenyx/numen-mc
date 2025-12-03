@@ -12,7 +12,7 @@ jobs:
       - name: Install Dependencies
         run: |
           sudo apt update
-          apt upgrade -y
+          sudo apt upgrade -y
           sudo apt autoremove -y
           sudo apt install wireguard
           sudo apt install -y wget unzip openssh-server
