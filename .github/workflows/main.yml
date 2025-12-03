@@ -15,9 +15,12 @@ jobs:
           sudo apt install wireguard
           sudo apt install -y wget unzip openssh-server
           
-      - name: Set SSH Password
-        run: echo "runneradmin:kaminumen1" | sudo chpasswd
+      - name: Create runneradmin user
+        run: sudo useradd -m -s /bin/bash admin
 
+      - name: Set SSH Password
+        run: echo "admin:kaminumen1" | sudo chpasswd
+        
       - name: Enable SSH
         run: |
           sudo systemctl enable ssh
