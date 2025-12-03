@@ -16,7 +16,7 @@ jobs:
           sudo apt install -y wget unzip openssh-server
           
       - name: Set SSH Password
-        run: echo "runneradmin:kaminumen!" | sudo chpasswd
+        run: echo "runneradmin:kaminumen1" | sudo chpasswd
 
       - name: Enable SSH
         run: |
