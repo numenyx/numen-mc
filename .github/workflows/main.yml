@@ -16,10 +16,10 @@ jobs:
           sudo apt install -y wget unzip openssh-server
           
       - name: Create runneradmin user
-        run: sudo useradd -m -s /bin/bash admin
+        run: sudo useradd -m -s /bin/bash runneradmin
 
       - name: Set SSH Password
-        run: echo "admin:kaminumen1" | sudo chpasswd
+        run: echo "runneradmin:kaminumen1" | sudo chpasswd
         
       - name: Enable SSH
         run: |
