@@ -10,7 +10,44 @@ jobs:
 
     steps:
       - name: Install Dependencies
-        run: sudo apt update && sudo apt install -y wget unzip openssh-server
+        run: |
+          sudo apt update
+          sudo apt install -y wget unzip
+
+      - name: Download WireGuard-Go (userspace WG)
+        run: |
+          wget https://github.com/WireGuard/wireguard-go/releases/latest/download/wireguard-go-linux-amd64 -O wireguard-go
+          chmod +x wireguard-go
+
+      - name: Download WireGuard Tools (wg + wg-quick)
+        run: |
+          wget https://github.com/WireGuard/wgctrl-go/releases/latest/download/wg -O wg
+          chmod +x wg
+
+      - name: Create wg0.conf
+        run: |
+          mkdir -p wg
+          cat <<EOF > wg/wg0.conf
+[Interface]
+PrivateKey = ${{ secrets.WG_PRIVATE_KEY }}
+Address = 10.0.0.2/24
+DNS = 1.1.1.1
+
+[Peer]
+PublicKey = ${{ secrets.WG_PEER_PUBLIC }}
+Endpoint = ${{ secrets.WG_ENDPOINT }}
+AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 25
+EOF
+
+      - name: Run WireGuard-Go Userspace
+        run: |
+          sudo ip link add dev wg0 type wireguard || true
+          sudo ip addr add 10.0.0.2/24 dev wg0 || true
+          sudo ip link set wg0 up || true
+          ./wireguard-go wg0 &
+          sleep 2
+          ./wg setconf wg0 wg/wg0.conf
 
       - name: Download Ngrok
         run: wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip -O ngrok.zip
@@ -20,20 +57,6 @@ jobs:
 
       - name: Authenticate Ngrok
         run: ./ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
-        env:
-          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
 
-      - name: Enable SSH Server
-        run: sudo systemctl start ssh && sudo systemctl enable ssh
-
-      - name: Create runneradmin user
-        run: sudo useradd -m -s /bin/bash runneradmin
-
-      - name: Set Default Password for runneradmin
-        run: echo "runneradmin:kaminumen!" | sudo chpasswd
-
-      - name: Allow SSH Login
-        run: sudo sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && sudo systemctl restart ssh
-
-      - name: Create SSH Tunnel with Ngrok
+      - name: Create SSH Tunnel via Ngrok
         run: ./ngrok tcp 22
