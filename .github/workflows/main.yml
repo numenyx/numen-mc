@@ -23,8 +23,7 @@ jobs:
         run: |
           wget https://github.com/WireGuard/wgctrl-go/releases/latest/download/wg -O wg
           chmod +x wg
-
-      - name: Create wg0.conf
+          
       - name: Run WireGuard-Go Userspace
         run: |
           sudo ip link add dev wg0 type wireguard || true
