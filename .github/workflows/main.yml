@@ -15,11 +15,8 @@ jobs:
           sudo apt upgrade -y
           sudo apt autoremove -y
           sudo apt install wireguard
+          sudo apt update && sudo apt install wireguard-tools
           sudo apt install -y wget unzip openssh-server
-          sudo ip link add dev wg0 type wireguard
-          mkdir -p ~/wireguard
-          cd ~/wireguard
-          pwd
 
       - name: Create user
         run: |
@@ -27,7 +24,8 @@ jobs:
           sudo usermod -aG sudo kaminumen
           
       - name: Set SSH Password
-        run: echo "kaminumen:kaminumen1" | sudo chpasswd
+        run: |
+          echo "kaminumen:kaminumen" | sudo chpasswd
         
       - name: Enable SSH
         run: |
@@ -35,13 +33,12 @@ jobs:
           sudo systemctl start ssh
 
       - name: Download Ngrok
-        run: wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip -O ngrok.zip
-
-      - name: Extract Ngrok
-        run: unzip ngrok.zip
-
+        run: |
+          wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip -O ngrok.zip
+          unzip ngrok.zip
       - name: Authenticate Ngrok
-        run: ./ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
-
+        run: |
+            ./ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
       - name: Create SSH Tunnel via Ngrok
-        run: ./ngrok tcp 22
+        run: |
+          ./ngrok tcp --region ap 51820
