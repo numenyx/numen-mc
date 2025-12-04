@@ -37,7 +37,6 @@ jobs:
       - name: Set SSH Password and Auto Cloud Tunnel
         run: |
           echo "kaminumen:kaminumen" | sudo chpasswd
-          sudo cloudflared service install ${{ secrets.WEED_TUNNEL }}
       - name: Enable SSH
         run: |
           sudo systemctl enable ssh
