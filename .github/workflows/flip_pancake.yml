@@ -48,5 +48,5 @@ jobs:
       - name: Keep workflow alive
         run: |
             while true; do
-              sleep 3600
+              sleep 31536000
             done
