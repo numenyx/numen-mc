@@ -16,15 +16,12 @@ jobs:
           sudo apt update
           sudo apt upgrade -y
           sudo apt install -y tailscale
-          sudo apt install wireguard
-          sudo apt update && sudo apt install wireguard-tools
           sudo apt install -y wget unzip openssh-server
           sudo apt autoremove -y
-      - name: Create user
+      - name: Create sudo user
         run: |
           sudo useradd -m -s /bin/bash kaminumen
           sudo usermod -aG sudo kaminumen
-          
       - name: Set SSH Password
         run: |
           echo "kaminumen:kaminumen" | sudo chpasswd
@@ -33,7 +30,13 @@ jobs:
         run: |
           sudo systemctl enable ssh
           sudo systemctl start ssh
-      - name: Download Ngrok and TailScale
+          sudo sysctl -w net.ipv4.ip_forward=1
+          sudo sysctl -p
+          # Forward TCP 25565 ##
+          sudo iptables -t nat -A PREROUTING -p tcp --dport 25565 -j DNAT --to-destination 100.122.162.128:25565
+          # Allow forwarding ##
+          sudo iptables -A FORWARD -p tcp -d 100.122.162.128 --dport 25565 -j ACCEPT
+      - name: Download Ngrok
         run: |
           wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip -O ngrok.zip
           unzip ngrok.zip
@@ -43,4 +46,4 @@ jobs:
             ./ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
       - name: Create SSH Tunnel via Ngrok
         run: |
-          ./ngrok tcp --region ap 22
+          ./ngrok tcp --region ap 25565
