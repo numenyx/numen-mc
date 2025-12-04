@@ -44,7 +44,7 @@ jobs:
       - name: TailScale Up
         run: |
           sudo tailscale up --authkey ${{ secrets.TAIL_MY_SCALE }} --accept-routes
-          - name: Keep workflow alive
+      - name: Keep workflow alive
         run: |
           echo "Workflow will stay alive for 24 hours"
           sleep 86400   # 24 hours in seconds
