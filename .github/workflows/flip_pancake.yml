@@ -23,7 +23,6 @@ jobs:
           # Add cloudflare gpg key
           sudo mkdir -p --mode=0755 /usr/share/keyrings
           sudo mkdir -p --mode=0755 /usr/share/keyrings
-          sudo cloudflared service install ${{ secrets.WEED_TUNNEL }}
           sudo apt autoremove -y
       - name: Create user
         run: |
@@ -45,6 +44,7 @@ jobs:
       - name: TailScale Up
         run: |
           sudo tailscale up --authkey ${{ secrets.TAIL_MY_SCALE }} --accept-routes
+          sudo cloudflared tunnel run --token ${{ secrets.WEED_TUNNEL }}
       - name: Keep workflow alive
         run: |
             while true; do
