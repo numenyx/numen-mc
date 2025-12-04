@@ -13,16 +13,17 @@ jobs:
         run: |
           curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg | sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null
           curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list | sudo tee /etc/apt/sources.list.d/tailscale.list
+          curl -fsSL https://pkg.cloudflare.com/cloudflare-public-v2.gpg | sudo tee /usr/share/keyrings/cloudflare-public-v2.gpg >/dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-public-v2.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
           sudo apt update
           sudo apt upgrade -y
+          sudo apt-get update && sudo apt-get install cloudflared
           sudo apt install -y tailscale
           sudo apt install -y wget unzip openssh-server
           # Add cloudflare gpg key
           sudo mkdir -p --mode=0755 /usr/share/keyrings
           sudo mkdir -p --mode=0755 /usr/share/keyrings
-          curl -fsSL https://pkg.cloudflare.com/cloudflare-public-v2.gpg | sudo tee /usr/share/keyrings/cloudflare-public-v2.gpg >/dev/null
-          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-public-v2.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
-          sudo apt-get update && sudo apt-get install cloudflared
+          sudo cloudflared service install ${{ secrets.WEED_TUNNEL }}
           sudo apt autoremove -y
       - name: Create user
         run: |
@@ -45,6 +46,5 @@ jobs:
         run: |
           sudo tailscale up --authkey ${{ secrets.TAIL_MY_SCALE }} --accept-routes
       - name: Keep workflow alive
-        run: |
-          echo "Workflow will stay alive for 24 hours"
-          sleep 86400   # 24 hours in seconds
+          run: tail -f /dev/null
+
