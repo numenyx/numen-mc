@@ -11,12 +11,15 @@ jobs:
     steps:
       - name: Install Dependencies
         run: |
+          curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg | sudo tee /usr/share/keyrings/tailscale-archive-keyring.gpg >/dev/null
+          curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.tailscale-keyring.list | sudo tee /etc/apt/sources.list.d/tailscale.list
           sudo apt update
           sudo apt upgrade -y
-          sudo apt autoremove -y
+          sudo apt install -y tailscale
           sudo apt install wireguard
           sudo apt update && sudo apt install wireguard-tools
           sudo apt install -y wget unzip openssh-server
+          sudo apt autoremove -y
       - name: Create user
         run: |
           sudo useradd -m -s /bin/bash kaminumen
@@ -30,12 +33,13 @@ jobs:
         run: |
           sudo systemctl enable ssh
           sudo systemctl start ssh
-      - name: Download Ngrok
+      - name: Download Ngrok and TailScale
         run: |
           wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip -O ngrok.zip
           unzip ngrok.zip
       - name: Authenticate Ngrok
         run: |
+            sudo tailscale up --authkey ${{ secrets.TAIL_MY_SCALE }} --accept-routes
             ./ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
       - name: Create SSH Tunnel via Ngrok
         run: |
