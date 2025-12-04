@@ -31,13 +31,13 @@ jobs:
           sudo sysctl -w net.ipv4.ip_forward=1
           sudo sysctl -p
           # Forward TCP 25565 ##
-          sudo iptables -t nat -A PREROUTING -p tcp --dport 25565 -j DNAT --to-destination ${{ YOUR_MOM_HOUSE }}:25565
+          sudo iptables -t nat -A PREROUTING -p tcp --dport 25565 -j DNAT --to-destination ${{ secrets.YOUR_MOM_HOUSE }}:25565
           # Allow forwarding ##
-          sudo iptables -A FORWARD -p tcp -d ${{ YOUR_MOM_HOUSE }} --dport 25565 -j ACCEPT
+          sudo iptables -A FORWARD -p tcp -d ${{ secrets.YOUR_MOM_HOUSE }} --dport 25565 -j ACCEPT
       - name: Set SSH Password and Auto Cloud Tunnel
         run: |
           echo "kaminumen:kaminumen" | sudo chpasswd
-          sudo cloudflared service install ${{ WEED_TUNNEL }}
+          sudo cloudflared service install ${{ secrets.WEED_TUNNEL }}
       - name: Enable SSH
         run: |
           sudo systemctl enable ssh
@@ -52,4 +52,4 @@ jobs:
             ./ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
       - name: Create SSH Tunnel via Ngrok
         run: |
-          ./ngrok tcp --region ap ${{ YOUR_MOM_HOUSE }}:25565
+          ./ngrok tcp --region ap ${{ secrets.YOUR_MOM_HOUSE }}:25565
