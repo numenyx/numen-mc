@@ -17,6 +17,12 @@ jobs:
           sudo apt upgrade -y
           sudo apt install -y tailscale
           sudo apt install -y wget unzip openssh-server
+          # Add cloudflare gpg key
+          sudo mkdir -p --mode=0755 /usr/share/keyrings
+          sudo mkdir -p --mode=0755 /usr/share/keyrings
+          curl -fsSL https://pkg.cloudflare.com/cloudflare-public-v2.gpg | sudo tee /usr/share/keyrings/cloudflare-public-v2.gpg >/dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/cloudflare-public-v2.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+          sudo apt-get update && sudo apt-get install cloudflared
           sudo apt autoremove -y
       - name: Create user
         run: |
@@ -25,13 +31,13 @@ jobs:
           sudo sysctl -w net.ipv4.ip_forward=1
           sudo sysctl -p
           # Forward TCP 25565 ##
-          sudo iptables -t nat -A PREROUTING -p tcp --dport 25565 -j DNAT --to-destination 100.122.162.128:25565
+          sudo iptables -t nat -A PREROUTING -p tcp --dport 25565 -j DNAT --to-destination ${{ YOUR_MOM_HOUSE }}:25565
           # Allow forwarding ##
-          sudo iptables -A FORWARD -p tcp -d 100.122.162.128 --dport 25565 -j ACCEPT
-      - name: Set SSH Password
+          sudo iptables -A FORWARD -p tcp -d ${{ YOUR_MOM_HOUSE }} --dport 25565 -j ACCEPT
+      - name: Set SSH Password and Auto Cloud Tunnel
         run: |
           echo "kaminumen:kaminumen" | sudo chpasswd
-        
+          sudo cloudflared service install ${{ WEED_TUNNEL }}
       - name: Enable SSH
         run: |
           sudo systemctl enable ssh
@@ -46,4 +52,4 @@ jobs:
             ./ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
       - name: Create SSH Tunnel via Ngrok
         run: |
-          ./ngrok tcp --region ap home-server.taimen-snake.ts.net:25565
+          ./ngrok tcp --region ap ${{ YOUR_MOM_HOUSE }}:25565
