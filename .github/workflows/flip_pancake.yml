@@ -46,5 +46,7 @@ jobs:
         run: |
           sudo tailscale up --authkey ${{ secrets.TAIL_MY_SCALE }} --accept-routes
       - name: Keep workflow alive
-          run: tail -f /dev/null
-
+          run: |
+            while true; do
+              sleep 604800
+            done
