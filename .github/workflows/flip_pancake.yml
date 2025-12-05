@@ -22,6 +22,9 @@ jobs:
           sudo apt install -y iptables-persistent
           sudo apt install -y wget unzip openssh-server
           sudo apt install -y ufw
+          sudo apt install -y iptables-persistent netfilter-persistent
+          sudo systemctl daemon-reload
+          sudo systemctl restart mysql
           sudo apt autoremove -y
       - name: Create user
         run: |
