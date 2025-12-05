@@ -19,10 +19,7 @@ jobs:
           sudo apt upgrade -y
           sudo apt-get update && sudo apt-get install cloudflared
           sudo apt install -y tailscale
-          sudo apt install -y iptables-persistent
-          sudo apt install -y wget unzip openssh-server
-          sudo apt install -y ufw
-          sudo apt install -y iptables-persistent netfilter-persistent
+          sudo apt install -y wget unzip openssh-server ufw iptables-persistent netfilter-persistent
           sudo systemctl daemon-reload
           sudo systemctl restart mysql
           sudo apt autoremove -y
